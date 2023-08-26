@@ -3,9 +3,9 @@ deps:
 	@go mod download
 	@go mod verify
 
-.PHONY: migrage_up
+.PHONY: migrate_up
 migrate_up:
-	@migrate -database "postgres://postgres:1234@db:5432/postgres?sslmode=disable" -path migrations up
+	migrate -database "postgres://postgres:1234@db:5432/postgres?sslmode=disable" -path migrations up
 
 .PHONY: wait
 wait:
