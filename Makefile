@@ -14,9 +14,9 @@ wait:
 
 .PHONY: build
 build: deps
-	@go build -buildvcs=false -o /usr/local/bin/server ./...
+	@go build -buildvcs=false -o /usr/local/bin/server ./cmd
 
 
 .PHONY: run
-run: wait migrate_up build
+run: wait migrate_up deps build
 	@server
