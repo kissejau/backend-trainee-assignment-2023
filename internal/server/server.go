@@ -9,6 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/config"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/db"
+	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/logger"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/segment"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/user"
 )
@@ -18,9 +19,10 @@ type Server interface {
 }
 
 type server struct {
-	port string
-	r    *httprouter.Router
-	db   *sql.DB
+	port   string
+	r      *httprouter.Router
+	db     *sql.DB
+	logger http.Handler
 }
 
 func NewServer() Server {
@@ -36,16 +38,19 @@ func NewServer() Server {
 
 	r := httprouter.New()
 
+	logger := logger.Logger(r)
+
 	return &server{
-		port: port,
-		r:    r,
-		db:   db,
+		port:   port,
+		r:      r,
+		db:     db,
+		logger: logger,
 	}
 }
 
 func (s *server) Run() {
 	s.Startup()
-	http.ListenAndServe(":8080", s.r)
+	http.ListenAndServe(":8080", s.logger)
 }
 
 func (s *server) Startup() {
