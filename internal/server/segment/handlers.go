@@ -59,14 +59,13 @@ func (h *handler) CreateSegment(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) GetSegmentBySlug(w http.ResponseWriter, r *http.Request) {
-	id := r.Header.Get("id")
-	_, err := strconv.Atoi(id)
-	if len(id) == 0 || err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte("incorrect header id"))
+	slug := r.Header.Get("slug")
+	if len(slug) == 0 {
+		response.Respond(w, http.StatusBadRequest, []byte("incorrect header slug"))
 		return
 	}
 
-	segment, err := h.r.Get(id)
+	segment, err := h.r.Get(slug)
 	if err != nil {
 		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
 		return
