@@ -2,7 +2,7 @@ package user
 
 import (
 	"database/sql"
-	"log"
+	"strings"
 	"time"
 )
 
@@ -62,19 +62,18 @@ type SqlableSegmentDTO struct {
 	Deadline sql.NullString `json:"deadline,omitempty"`
 }
 
-func (segmentDTO *SqlableSegmentDTO) SegmentWithActiveStatusDTO() *SegmentWithActiveStatusDTO {
-	segment := &SegmentWithActiveStatusDTO{
+func (segmentDTO *SqlableSegmentDTO) SegmentWithActiveStatusDTO() SegmentWithActiveStatusDTO {
+	segment := SegmentWithActiveStatusDTO{
 		Id:       segmentDTO.Id,
 		Slug:     segmentDTO.Slug,
 		IsActive: true,
 	}
 
 	if !segmentDTO.Deadline.Valid {
-		log.Println("NOTE 1")
-		log.Println(segmentDTO.Deadline)
 		return segment
 	}
-	date, _ := time.Parse("yyyy-mm-dd hh:mm:ss", segmentDTO.Deadline.String)
+
+	date, _ := time.Parse("2006-01-02T15:04:05Z", strings.TrimSpace(segmentDTO.Deadline.String))
 	if date.After(time.Now()) {
 		return segment
 	}

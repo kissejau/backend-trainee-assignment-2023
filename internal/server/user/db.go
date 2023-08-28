@@ -97,14 +97,14 @@ func (r *repository) GetSegments(userId string) ([]SegmentWithActiveStatusDTO, e
 	}
 
 	for rows.Next() {
-		var segment SqlableSegmentDTO
+		segment := &SqlableSegmentDTO{}
 		err := rows.Scan(&segment.Id, &segment.Slug, &segment.Deadline)
 
 		if err != nil {
 			return nil, err
 		}
 
-		segments = append(segments, *segment.SegmentWithActiveStatusDTO())
+		segments = append(segments, segment.SegmentWithActiveStatusDTO())
 	}
 	return segments, nil
 }
