@@ -84,9 +84,9 @@ func (r *repository) Delete(id string) error {
 	return nil
 }
 
-func (r *repository) GetSegments(userId string) ([]segment.Segment, error) {
-	var segments []segment.Segment
-	query := `SELECT s.id, s.slug FROM users_segments AS us
+func (r *repository) GetSegments(userId string) ([]SegmentWithActiveStatusDTO, error) {
+	var segments []SegmentWithActiveStatusDTO
+	query := `SELECT s.id, s.slug, us.deadline FROM users_segments AS us
 	JOIN segments AS s ON s.id = us.segment_id
 	JOIN users AS u ON u.id = us.user_id
 	WHERE u.id = $1`
@@ -97,38 +97,46 @@ func (r *repository) GetSegments(userId string) ([]segment.Segment, error) {
 	}
 
 	for rows.Next() {
-		var segment segment.Segment
+		segment := &SqlableSegmentDTO{}
+		err := rows.Scan(&segment.Id, &segment.Slug, &segment.Deadline)
 
-		err := rows.Scan(&segment.Id, &segment.Slug)
 		if err != nil {
 			return nil, err
 		}
 
-		segments = append(segments, segment)
+		segments = append(segments, segment.SegmentWithActiveStatusDTO())
 	}
 	return segments, nil
 }
 
-func (r *repository) SetSegments(setUserSegmentsDTO SetUserSegmentsDTO) error {
-	var upSegments, downSegments []segment.Segment
+func (r *repository) SetSegments(setUserSegmentsDTO SqlableSetUserSegmentsDTO) error {
+	var upSegments, downSegments []SqlableSegmentDTO
 	for _, slug := range setUserSegmentsDTO.UpSlugs {
-		segment, err := r.sr.Get(slug)
+		segment, err := r.sr.Get(slug.Slug)
 		if err != nil {
 			// log
 			continue
 		}
 
-		upSegments = append(upSegments, segment)
+		upSegments = append(upSegments, SqlableSegmentDTO{
+			Id:       segment.Id,
+			Slug:     segment.Slug,
+			Deadline: slug.Deadline,
+		})
 	}
 
 	for _, slug := range setUserSegmentsDTO.DownSlugs {
-		segment, err := r.sr.Get(slug)
+		segment, err := r.sr.Get(slug.Slug)
 		if err != nil {
 			// log
 			continue
 		}
 
-		downSegments = append(downSegments, segment)
+		downSegments = append(downSegments, SqlableSegmentDTO{
+			Id:       segment.Id,
+			Slug:     segment.Slug,
+			Deadline: slug.Deadline,
+		})
 	}
 
 	err := r.AddSegments(upSegments, setUserSegmentsDTO.UserId)
@@ -142,9 +150,9 @@ func (r *repository) SetSegments(setUserSegmentsDTO SetUserSegmentsDTO) error {
 	return nil
 }
 
-func (r *repository) AddSegments(segments []segment.Segment, userId string) error {
+func (r *repository) AddSegments(segments []SqlableSegmentDTO, userId string) error {
 	for _, segment := range segments {
-		err := r.AddSegment(segment.Id, userId)
+		err := r.AddSegment(segment, userId)
 		if err != nil {
 			return err
 		}
@@ -152,17 +160,24 @@ func (r *repository) AddSegments(segments []segment.Segment, userId string) erro
 	return nil
 }
 
-func (r *repository) AddSegment(segmentId, userId string) error {
-	query := `INSERT INTO users_segments (user_id, segment_id) VALUES ($1, $2)`
+func (r *repository) AddSegment(segment SqlableSegmentDTO, userId string) error {
+	query := `INSERT INTO users_segments (user_id, segment_id, deadline) VALUES ($1, $2, $3)`
 
-	_, err := r.db.Exec(query, userId, segmentId)
+	var err error
+
+	if segment.Deadline.String == "" {
+		_, err = r.db.Exec(query, userId, segment.Id, nil)
+	} else {
+		_, err = r.db.Exec(query, userId, segment.Id, segment.Deadline)
+	}
+
 	if err != nil {
 		return fmt.Errorf("insert to users_segments failure")
 	}
 	return nil
 }
 
-func (r *repository) DeleteSegments(segments []segment.Segment, userId string) error {
+func (r *repository) DeleteSegments(segments []SqlableSegmentDTO, userId string) error {
 	for _, segment := range segments {
 		err := r.DeleteSegment(segment.Id, userId)
 		if err != nil {

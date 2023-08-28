@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -164,25 +165,17 @@ func (h *handler) GetUserSegments(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) SetUserSegments(w http.ResponseWriter, r *http.Request) {
-	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
-		return
-	}
-
 	var setUserSegmentsDTO SetUserSegmentsDTO
-	err = json.Unmarshal(data, &setUserSegmentsDTO)
-	if err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
-		return
-	}
+	err := json.NewDecoder(r.Body).Decode(&setUserSegmentsDTO)
 
 	if setUserSegmentsDTO.UserId == "" {
 		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
 		return
 	}
 
-	err = h.r.SetSegments(setUserSegmentsDTO)
+	sqlableSetUserSegmentsDTO := setUserSegmentsDTO.SqlableSetUserSegmentsDTO()
+	log.Println("HANDLER NOTE", sqlableSetUserSegmentsDTO)
+	err = h.r.SetSegments(sqlableSetUserSegmentsDTO)
 	if err != nil {
 		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
 		return
