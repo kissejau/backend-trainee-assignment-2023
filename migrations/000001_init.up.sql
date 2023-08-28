@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS segments (
     id SERIAL PRIMARY KEY,
-    slug VARCHAR
+    slug VARCHAR UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -14,5 +14,6 @@ CREATE TABLE IF NOT EXISTS users_segments (
     -- ttl_flag BOOLEAN,
     -- ttl_deadline TIMESTAMP
     user_id INTEGER REFERENCES users(id),
-    segment_id INTEGER REFERENCES segments(id)
+    segment_id INTEGER REFERENCES segments(id),
+    UNIQUE(user_id, segment_id)
 );
