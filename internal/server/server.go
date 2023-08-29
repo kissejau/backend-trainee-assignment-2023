@@ -9,6 +9,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/config"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/db"
+	logEntity "github.com/kissejau/backend-trainee-assignment-2023/internal/server/log"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/logger"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/segment"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/user"
@@ -56,10 +57,13 @@ func (s *server) Run() {
 func (s *server) Startup() {
 	segmentRepo := segment.NewRepository(s.db)
 	userRepo := user.NewRepository(s.db, segmentRepo)
+	historyRepo := logEntity.NewRepository(s.db)
 
 	segmentHandler := segment.NewHandler(segmentRepo)
 	userHandler := user.NewHandler(userRepo)
+	historyHandler := logEntity.NewHandler(historyRepo)
 
 	userHandler.Register(s.r)
 	segmentHandler.Register(s.r)
+	historyHandler.Register(s.r)
 }
