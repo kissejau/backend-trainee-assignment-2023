@@ -2,6 +2,7 @@ package segment
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 type repository struct {
@@ -19,7 +20,7 @@ func (r *repository) Create(segment Segment) error {
 
 	_, err := r.db.Exec(query, segment.Slug)
 	if err != nil {
-		return err
+		return fmt.Errorf("error while creating a segment")
 	}
 	return nil
 }
@@ -31,7 +32,7 @@ func (r *repository) Get(slug string) (Segment, error) {
 	row := r.db.QueryRow(query, slug)
 	err := row.Scan(&segment.Id, &segment.Slug)
 	if err != nil {
-		return Segment{}, err
+		return Segment{}, fmt.Errorf("no segment with slug=%v", slug)
 	}
 	return segment, nil
 }
@@ -42,14 +43,14 @@ func (r *repository) List() ([]Segment, error) {
 
 	rows, err := r.db.Query(query)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error while selecting segments")
 	}
 
 	for rows.Next() {
 		var segment Segment
 		err := rows.Scan(&segment.Id, &segment.Slug)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error while scanning segment")
 		}
 		segments = append(segments, segment)
 	}
@@ -61,7 +62,8 @@ func (r *repository) Update(segment Segment) error {
 
 	_, err := r.db.Exec(query, segment.Id, segment.Slug)
 	if err != nil {
-		return err
+		return fmt.Errorf("segment with id=%v not found or slug=%v isn`t correct",
+			segment.Id, segment.Slug)
 	}
 	return nil
 }
@@ -71,7 +73,7 @@ func (r *repository) Delete(id string) error {
 
 	_, err := r.db.Exec(query, id)
 	if err != nil {
-		return err
+		return fmt.Errorf("user with id=%v not found", id)
 	}
 	return nil
 }
