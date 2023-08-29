@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/errors"
 	"github.com/kissejau/backend-trainee-assignment-2023/internal/server/handlers"
 	"github.com/kissejau/backend-trainee-assignment-2023/pkg/response"
 )
@@ -38,14 +39,14 @@ func (h *handler) Register(r *httprouter.Router) {
 func (h *handler) CreateSegment(w http.ResponseWriter, r *http.Request) {
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
+		response.Respond(w, http.StatusBadRequest, []byte(errors.ErrReadingBody.Error()))
 		return
 	}
 
 	var segment Segment
 	err = json.Unmarshal(data, &segment)
 	if err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
+		response.Respond(w, http.StatusBadRequest, []byte(errors.ErrInvalidBody.Error()))
 		return
 	}
 
@@ -61,7 +62,7 @@ func (h *handler) CreateSegment(w http.ResponseWriter, r *http.Request) {
 func (h *handler) GetSegmentBySlug(w http.ResponseWriter, r *http.Request) {
 	slug := r.Header.Get("slug")
 	if len(slug) == 0 {
-		response.Respond(w, http.StatusBadRequest, []byte("incorrect header slug"))
+		response.Respond(w, http.StatusBadRequest, []byte(errors.ErrIncorrectHeader.Error()))
 		return
 	}
 
@@ -99,14 +100,14 @@ func (h *handler) GetSegments(w http.ResponseWriter, r *http.Request) {
 func (h *handler) UpdateSegment(w http.ResponseWriter, r *http.Request) {
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
+		response.Respond(w, http.StatusBadRequest, []byte(errors.ErrReadingBody.Error()))
 		return
 	}
 
 	var segment Segment
 	err = json.Unmarshal(data, &segment)
 	if err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
+		response.Respond(w, http.StatusBadRequest, []byte(errors.ErrInvalidBody.Error()))
 		return
 	}
 
@@ -122,7 +123,7 @@ func (h *handler) DeleteSegment(w http.ResponseWriter, r *http.Request) {
 	id := r.Header.Get("id")
 	_, err := strconv.Atoi(id)
 	if len(id) == 0 || err != nil {
-		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
+		response.Respond(w, http.StatusBadRequest, []byte(errors.ErrIncorrectHeader.Error()))
 		return
 	}
 

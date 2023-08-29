@@ -114,7 +114,7 @@ func (r *repository) SetSegments(setUserSegmentsDTO SqlableSetUserSegmentsDTO) e
 	for _, slug := range setUserSegmentsDTO.UpSlugs {
 		segment, err := r.sr.Get(slug.Slug)
 		if err != nil {
-			// log
+			// todo
 			continue
 		}
 
@@ -128,7 +128,7 @@ func (r *repository) SetSegments(setUserSegmentsDTO SqlableSetUserSegmentsDTO) e
 	for _, slug := range setUserSegmentsDTO.DownSlugs {
 		segment, err := r.sr.Get(slug.Slug)
 		if err != nil {
-			// log
+			// todo
 			continue
 		}
 
@@ -172,7 +172,7 @@ func (r *repository) AddSegment(segment SqlableSegmentDTO, userId string) error 
 	}
 
 	if err != nil {
-		return fmt.Errorf("insert to users_segments failure")
+		return fmt.Errorf("failure while inserting segments to user with id=%v", userId)
 	}
 	return nil
 }
@@ -192,7 +192,7 @@ func (r *repository) DeleteSegment(segmentId, userId string) error {
 
 	_, err := r.db.Exec(query, userId, segmentId)
 	if err != nil {
-		return fmt.Errorf("delete from users_segments error")
+		return fmt.Errorf("failure while deleting segments of user with id=%v", userId)
 	}
 	return nil
 }

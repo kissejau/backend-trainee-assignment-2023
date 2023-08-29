@@ -1,6 +1,6 @@
 package segment
 
 type Segment struct {
-	Id   string
-	Slug string
+	Id   string `json:"id"`
+	Slug string `json:"slug"`
 }
