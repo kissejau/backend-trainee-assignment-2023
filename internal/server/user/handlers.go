@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -122,7 +121,7 @@ func (h *handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
 		return
 	}
-	response.Respond(w, http.StatusAccepted, []byte("user was updated"))
+	response.Respond(w, http.StatusAccepted, data)
 }
 
 func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -139,7 +138,7 @@ func (h *handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Respond(w, http.StatusAccepted, []byte(fmt.Sprintf("user with id=%v was delted", id)))
+	response.Respond(w, http.StatusAccepted, []byte(""))
 }
 
 func (h *handler) GetUserSegments(w http.ResponseWriter, r *http.Request) {
@@ -186,5 +185,5 @@ func (h *handler) SetUserSegments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Respond(w, http.StatusAccepted, []byte("segments were set"))
+	response.Respond(w, http.StatusAccepted, []byte(""))
 }

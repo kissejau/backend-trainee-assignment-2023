@@ -2,7 +2,6 @@ package segment
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -116,7 +115,7 @@ func (h *handler) UpdateSegment(w http.ResponseWriter, r *http.Request) {
 		response.Respond(w, http.StatusBadRequest, []byte(err.Error()))
 		return
 	}
-	response.Respond(w, http.StatusAccepted, []byte("segment was updated"))
+	response.Respond(w, http.StatusAccepted, data)
 }
 
 func (h *handler) DeleteSegment(w http.ResponseWriter, r *http.Request) {
@@ -133,5 +132,5 @@ func (h *handler) DeleteSegment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.Respond(w, http.StatusAccepted, []byte(fmt.Sprintf("segment with id=%v was delted", id)))
+	response.Respond(w, http.StatusAccepted, []byte(""))
 }
