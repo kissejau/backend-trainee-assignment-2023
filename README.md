@@ -1,10 +1,15 @@
 # [Тестовое задание (clickable)](https://github.com/avito-tech/backend-trainee-assignment-2023)
 
-## Запуск:
+## Установка и запуск:
 
 ```
+git clone https://github.com/kissejau/backend-trainee-assignment-2023
+cd backend-trainee-assignment-2023
 docker compose up
 ```
+
+## Примечание:
+Порты 8080 и 5432 должны быть свободны.
 
 ## Задача:
 
